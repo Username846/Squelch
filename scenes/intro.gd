@@ -10,6 +10,7 @@ func _ready() -> void:
 	Game.play_music("intro")
 	for i in 120:
 		rain.append(Vector2(randf() * 1280, randf() * 720))
+	Game.set_skip(_skip)
 	_run.call_deferred()
 
 
@@ -45,11 +46,15 @@ func _run() -> void:
 	Game.goto("res://scenes/board.gd")
 
 
+func _skip() -> void:
+	Game.data["seen_intro"] = true
+	Game.save()
+	Game.goto("res://scenes/board.gd")
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
-		Game.data["seen_intro"] = true
-		Game.save()
-		Game.goto("res://scenes/board.gd")
+		_skip()
 
 
 func _process(delta: float) -> void:
@@ -94,4 +99,3 @@ func _draw() -> void:
 					Art.cloud(self, Vector2(640 + sin(i * 1.7 + t) * 300, 500 - i * 30), 80 + i * 10, Color(0.6, 0.8, 0.25, 0.25 + 0.4 * k))
 	for r: Vector2 in rain:
 		draw_line(r, r + Vector2(-4, 22), Color(0.6, 0.7, 0.9, 0.35), 1.5)
-	Art.text(self, Vector2(1180, 30), "Esc = skip", 18, Color(1, 1, 1, 0.35))

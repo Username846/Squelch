@@ -41,7 +41,62 @@ func tap(code: Key) -> void:
 	await frames(2)
 
 
+## Injected events are in window coordinates; convert from the 1280x720 game space.
+func to_window(p: Vector2) -> Vector2:
+	return get_viewport().get_screen_transform() * p
+
+
+func mouse(p: Vector2, down: bool) -> void:
+	p = to_window(p)
+	var ev := InputEventMouseButton.new()
+	ev.button_index = MOUSE_BUTTON_LEFT
+	ev.position = p
+	ev.global_position = p
+	ev.pressed = down
+	Input.parse_input_event(ev)
+	await frames(2)
+
+
+func touch(p: Vector2, down: bool, index := 0) -> void:
+	p = to_window(p)
+	var ev := InputEventScreenTouch.new()
+	ev.index = index
+	ev.position = p
+	ev.pressed = down
+	Input.parse_input_event(ev)
+	await frames(2)
+
+
+## Mouse-only and touch-only play: the action button and hold-to-walk must work.
+func _pointer_checks(level: LevelBase) -> void:
+	if level.uses_action_button() and level.action_active():
+		await mouse(level.action_pos(), true)
+		if not Input.is_action_pressed("fart"):
+			push_error("SMOKE FAIL: mouse on action button did not press fart in " + level.level_id)
+		await mouse(level.action_pos(), false)
+		await touch(level.action_pos(), true, 1)
+		if not Input.is_action_pressed("fart"):
+			push_error("SMOKE FAIL: touch on action button did not press fart in " + level.level_id)
+		await touch(level.action_pos(), false, 1)
+		if Input.is_action_pressed("fart"):
+			push_error("SMOKE FAIL: fart stuck after release in " + level.level_id)
+	if level.uses_pointer_move():
+		var start := level.pp
+		var target := Vector2(640, 400) if start.distance_to(Vector2(640, 400)) > 150 else Vector2(300, 600)
+		await mouse(target, true)
+		await frames(40)
+		await mouse(target, false)
+		var mid := level.pp
+		await touch(start, true, 0)
+		await frames(40)
+		await touch(start, false, 0)
+		print("  pointer walk: ", start, " -> ", mid, " -> ", level.pp)
+		if mid.distance_to(start) < 20.0 or level.pp.distance_to(mid) < 20.0:
+			push_error("SMOKE FAIL: hold-to-walk did not move Squelch in " + level.level_id)
+
+
 func _run() -> void:
+	print("SMOKE window ", DisplayServer.window_get_size(), " screen xf ", get_viewport().get_screen_transform())
 	Game.reset_save()
 	for s: String in SCENES:
 		print("SMOKE scene ", s)
@@ -61,9 +116,14 @@ func _run() -> void:
 				await tap(KEY_SPACE)
 				await frames(10)
 			await frames(20)
+			if not Game.current_scene is LevelBase:
+				push_error("SMOKE FAIL: %s did not load" % lv["path"])
+				get_tree().quit(1)
+				return
 			var level: LevelBase = Game.current_scene
 			print("  state after intro: ", level.state)
 			if mode == "play":
+				await _pointer_checks(level)
 				for k in 200:
 					var codes := [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_X, KEY_1, KEY_3]
 					var c: Key = codes[k % codes.size()]

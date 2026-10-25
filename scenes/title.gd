@@ -9,6 +9,16 @@ var buildings: Array = []
 
 func _ready() -> void:
 	Game.play_music("title")
+	var ui := CanvasLayer.new()
+	add_child(ui)
+	var mute := Button.new()
+	mute.text = "Sound: off" if Game.muted else "Sound: on"
+	mute.position = Vector2(20, 668)
+	mute.focus_mode = Control.FOCUS_NONE
+	mute.pressed.connect(func() -> void:
+		Game.toggle_mute()
+		mute.text = "Sound: off" if Game.muted else "Sound: on")
+	ui.add_child(mute)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 42
 	var x := 0.0
@@ -74,8 +84,7 @@ func _draw() -> void:
 	Art.text(self, Vector2(640, 170 + wob), "SQUELCH", 140, Color(0.65, 0.9, 0.3), true, 22, Color(0.2, 0.05, 0.3))
 	Art.text(self, Vector2(640, 230), "A LIFE OF FART CRIME", 38, Color(0.95, 0.85, 1.0), true, 10, Color(0.2, 0.05, 0.3))
 	var a := 0.5 + 0.5 * sin(t * 4.0)
-	Art.text(self, Vector2(640, 690), "Click or press SPACE to begin", 30, Color(1, 1, 1, a), true, 6)
+	Art.text(self, Vector2(640, 690), "Click, tap or press SPACE to begin", 30, Color(1, 1, 1, a), true, 6)
 	if Game.egg_count() > 0:
 		Art.star(self, Vector2(1150, 690), 14, Color(1, 0.8, 0.15))
 		Art.text(self, Vector2(1205, 700), "%d/10" % Game.egg_count(), 26, Color(1, 0.85, 0.3), true, 6)
-	Art.text(self, Vector2(110, 700), "M = mute", 18, Color(1, 1, 1, 0.4), true)

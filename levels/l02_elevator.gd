@@ -37,7 +37,7 @@ func intro_lines() -> Array:
 	return [
 		["Narrator", "Crime number two. The Grand Tower elevator. Thirty floors. Four strangers."],
 		["Squelch", "Ah, the elevator. Nature's slow cooker."],
-		["Narrator", "Your pressure keeps rising. HOLD SPACE to silently release. When the air gets bad enough, passengers bail at the next floor."],
+		["Narrator", "Your pressure keeps rising. HOLD the button, or SPACE, to silently release. When the air gets bad enough, passengers bail at the next floor."],
 		["Narrator", "But if anyone sees you releasing, they'll get suspicious. Watch for the question marks! Clear the elevator before the lobby."],
 	]
 
@@ -47,10 +47,6 @@ func win_lines() -> Array:
 		["Passenger", "I'll take the stairs. All thirty floors of them."],
 		["Squelch", "Going down? No. Going... dirty."],
 	]
-
-
-func uses_dpad() -> bool:
-	return false
 
 
 func action_text() -> String:
@@ -218,4 +214,4 @@ func draw_hud() -> void:
 	Art.meter(self, Rect2(340, 20, 260, 34), stink / 100.0, Art.GAS, "STINK")
 	Art.meter(self, Rect2(620, 20, 300, 34), suspicion / 100.0, Color(0.95, 0.25, 0.25), "SUSPICION")
 	Art.text(self, Vector2(1100, 48), "Passengers: %d" % _count_here(), 24, Color.WHITE, true, 6)
-	Art.text(self, Vector2(640, 705), "HOLD SPACE to release silently — not while anyone's looking!", 20, Color(1, 1, 1, 0.75), true, 5)
+	Art.text(self, Vector2(640, 705), "HOLD to release silently — not while anyone's looking!", 20, Color(1, 1, 1, 0.75), true, 5)

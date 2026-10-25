@@ -20,8 +20,13 @@ func music_name() -> String:
 	return "party"
 
 
+func uses_pointer_move() -> bool:
+	return true
+
+
 func setup() -> void:
 	level_id = "party"
+	pointer_anchor = Vector2(0, -40)
 	pp = Vector2(640, 660)
 	_make_round()
 
@@ -31,7 +36,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number one. Little Tammy's seventh birthday party."],
 		["Squelch", "Musical chairs. The purest game of childhood. Ha. Not for long."],
 		["Squelch", "While the music plays, I fart on every single chair. When it stops... they sit."],
-		["Narrator", "Move with the arrow keys or WASD. Press SPACE next to a chair to foul it. Foul them all before the music stops!"],
+		["Narrator", "Hold the mouse or your finger where you want to walk, or use the arrow keys. Next to a chair, hit the FART button or SPACE. Foul them all before the music stops!"],
 	]
 
 

@@ -23,9 +23,16 @@ Every crime hides one **secret stash** — no hints given. Find all ten to open
 
 ## Controls
 
-- **Arrows / WASD** move, **Space** farts, **X / Enter** is the alternate action
-- Most crimes can also be played with the mouse or touch (on-screen pad appears on touch screens)
-- **Esc** returns to the crime board, **M** mutes
+Every crime plays fully with **just a mouse**, **just a touch screen**, or **just a keyboard**.
+
+| | Mouse / touch | Keyboard |
+|---|---|---|
+| Walk (Party, Library, Heist) | hold the mouse button or a finger where you want to go | arrows / WASD |
+| Fart / boost / gas | on-screen action button (hold it in the elevator) | Space |
+| Everything else | click or tap the thing (lanes, dishes, valves, buttons) | arrows, Space, X, 1-5 |
+| Skip a cutscene, back to the board, sound | on-screen Skip, X and Sound buttons | Esc, M |
+
+On phones, play in landscape. On touch screens you can walk with one finger and fart with another.
 
 ## Tech
 

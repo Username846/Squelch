@@ -1,6 +1,6 @@
 extends Node
 ## Global game state: save data, scene switching, music, sound effects,
-## synthesized-voice dialogue and on-screen touch controls.
+## synthesized-voice dialogue.
 
 signal advanced
 
@@ -87,6 +87,8 @@ var _typing := false
 var _type_pos := 0.0
 var _dlg_cooldown := 0.0
 var _dlg_cancel := false
+var _skip_btn: Button
+var _skip_action := Callable()
 
 # transition + banners
 var _fade_layer: CanvasLayer
@@ -94,11 +96,6 @@ var _fade: ColorRect
 var _banner: Label
 var _banner_t := 0.0
 
-# touch controls
-var _touch_layer: CanvasLayer
-var _touch_dpad: Node2D
-var _touch_fart: TouchScreenButton
-var _touch_fart_label: Label
 
 
 func _ready() -> void:
@@ -115,7 +112,6 @@ func _ready() -> void:
 		_sfx_pool.append(p)
 	_build_dialog()
 	_build_fade()
-	_build_touch()
 
 
 # ------------------------------------------------------------------ input
@@ -139,9 +135,7 @@ func _setup_input() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_M:
-		muted = not muted
-		AudioServer.set_bus_mute(0, muted)
-		banner("Sound off" if muted else "Sound on")
+		toggle_mute()
 	if not dialog_active:
 		return
 	var go := false
@@ -149,7 +143,8 @@ func _input(event: InputEvent) -> void:
 		var k: int = event.physical_keycode
 		go = k == KEY_SPACE or k == KEY_ENTER or k == KEY_KP_ENTER or k == KEY_Z or k == KEY_X
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		go = true
+		# let the cutscene Skip button receive its own click
+		go = not (_skip_btn.visible and _skip_btn.get_global_rect().has_point(event.position))
 	if go:
 		get_viewport().set_input_as_handled()
 		if _dlg_cooldown > 0.0:
@@ -257,7 +252,7 @@ func goto(path: String) -> void:
 		_dlg_cancel = true
 		advanced.emit()
 	tts_stop()
-	set_touch_controls(false)
+	set_skip(Callable())
 	_fade.color.a = 1.0
 	if current_scene and is_instance_valid(current_scene):
 		current_scene.queue_free()
@@ -301,6 +296,14 @@ func banner(text: String, secs := 2.5) -> void:
 
 
 # ------------------------------------------------------------------ audio
+func toggle_mute() -> void:
+	muted = not muted
+	AudioServer.set_bus_mute(0, muted)
+	if muted:
+		tts_stop()
+	banner("Sound off" if muted else "Sound on", 1.2)
+
+
 func play_music(name: String, restart := false) -> void:
 	if name == music_name and music.playing and not restart:
 		music.stream_paused = false
@@ -408,12 +411,29 @@ func _build_dialog() -> void:
 	_dlg_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_dlg_text.add_theme_font_size_override("font_size", 26)
 	panel.add_child(_dlg_text)
+	_skip_btn = Button.new()
+	_skip_btn.text = "Skip >>"
+	_skip_btn.position = Vector2(1150, 12)
+	_skip_btn.size = Vector2(118, 44)
+	_skip_btn.focus_mode = Control.FOCUS_NONE
+	_skip_btn.add_theme_font_size_override("font_size", 20)
+	_skip_btn.visible = false
+	_skip_btn.pressed.connect(func() -> void:
+		if _skip_action.is_valid():
+			_skip_action.call())
+	_dlg_layer.add_child(_skip_btn)
 	_dlg_hint = Label.new()
 	_dlg_hint.text = "click / space  >>"
 	_dlg_hint.position = Vector2(880, 140)
 	_dlg_hint.add_theme_font_size_override("font_size", 18)
 	_dlg_hint.add_theme_color_override("font_color", Color(0.6, 0.85, 0.3))
 	panel.add_child(_dlg_hint)
+
+
+## Shows a "Skip" button (top right) that runs `action`; an empty Callable hides it.
+func set_skip(action: Callable) -> void:
+	_skip_action = action
+	_skip_btn.visible = action.is_valid()
 
 
 func speaker_color(who: String) -> Color:
@@ -448,63 +468,3 @@ func talk(lines: Array) -> bool:
 	var ok := not _dlg_cancel
 	_dlg_cancel = false
 	return ok
-
-
-# ------------------------------------------------------------------ touch controls
-func _circle_tex(radius: int, col: Color) -> ImageTexture:
-	var img := Image.create(radius * 2, radius * 2, false, Image.FORMAT_RGBA8)
-	for y in radius * 2:
-		for x in radius * 2:
-			var d := Vector2(x - radius + 0.5, y - radius + 0.5).length()
-			var a := clampf(radius - d, 0.0, 1.0)
-			var rim := 1.0 if d > radius - 5 else 0.0
-			img.set_pixel(x, y, Color(col.r + rim * 0.3, col.g + rim * 0.3, col.b + rim * 0.3, col.a * a))
-	return ImageTexture.create_from_image(img)
-
-
-func _touch_button(parent: Node, action: String, pos: Vector2, radius: int, text: String) -> TouchScreenButton:
-	var b := TouchScreenButton.new()
-	b.texture_normal = _circle_tex(radius, Color(0.2, 0.15, 0.3, 0.45))
-	b.texture_pressed = _circle_tex(radius, Color(0.5, 0.8, 0.3, 0.6))
-	var shape := CircleShape2D.new()
-	shape.radius = radius
-	b.shape = shape
-	b.action = action
-	b.position = pos - Vector2(radius, radius)
-	b.visibility_mode = TouchScreenButton.VISIBILITY_TOUCHSCREEN_ONLY
-	parent.add_child(b)
-	var l := Label.new()
-	l.text = text
-	l.size = Vector2(radius * 2, radius * 2)
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.add_theme_font_size_override("font_size", 40 if text.length() < 3 else 22)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	b.add_child(l)
-	return b
-
-
-func _build_touch() -> void:
-	_touch_layer = CanvasLayer.new()
-	_touch_layer.layer = 30
-	add_child(_touch_layer)
-	_touch_dpad = Node2D.new()
-	_touch_layer.add_child(_touch_dpad)
-	var c := Vector2(150, 560)
-	_touch_button(_touch_dpad, "up", c + Vector2(0, -78), 44, "^")
-	_touch_button(_touch_dpad, "down", c + Vector2(0, 78), 44, "v")
-	_touch_button(_touch_dpad, "left", c + Vector2(-78, 0), 44, "<")
-	_touch_button(_touch_dpad, "right", c + Vector2(78, 0), 44, ">")
-	_touch_fart = _touch_button(_touch_layer, "fart", Vector2(1140, 570), 70, "FART")
-	_touch_fart_label = _touch_fart.get_child(0)
-	set_touch_controls(false)
-
-
-## Shows the on-screen d-pad / action button (only ever visible on touch screens).
-func set_touch_controls(on: bool, dpad := true, action_text := "FART") -> void:
-	if _touch_layer == null:
-		return
-	on = on and DisplayServer.is_touchscreen_available()
-	_touch_layer.visible = on
-	_touch_dpad.visible = on and dpad
-	_touch_fart_label.text = action_text

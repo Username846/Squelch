@@ -29,6 +29,14 @@ func music_name() -> String:
 	return "library"
 
 
+func uses_pointer_move() -> bool:
+	return true
+
+
+func action_pos() -> Vector2:
+	return Vector2(1180, 150)
+
+
 func setup() -> void:
 	level_id = "library"
 	pp = START
@@ -40,7 +48,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number three. The City Library. Silence is golden."],
 		["Librarian", "Shhhh."],
 		["Squelch", "Silence is golden. But my farts? My farts are silent... and green."],
-		["Narrator", "Sneak up to all five readers and press SPACE to crop-dust them. Stay out of the librarian's sight, and remember: she can hear a fart nearby."],
+		["Narrator", "Sneak up to all five readers and hit FART (or SPACE) to crop-dust them. Hold the mouse or your finger to walk, or use the arrow keys. Stay out of the librarian's sight, and remember: she can hear a fart nearby."],
 	]
 
 
@@ -165,4 +173,4 @@ func draw_hud() -> void:
 	var n := dusted.count(true)
 	Art.text(self, Vector2(200, 46), "Readers dusted: %d/5" % n, 28, Color.WHITE, true, 6)
 	Art.text(self, Vector2(640, 46), "Lives: %d" % lives, 28, Color(1, 0.5, 0.5), true, 6)
-	Art.text(self, Vector2(1000, 46), "Move: arrows/WASD   Dust: SPACE", 20, Color(1, 1, 1, 0.7), true, 4)
+	Art.text(self, Vector2(1000, 46), "Hold to walk, FART to dust", 20, Color(1, 1, 1, 0.7), true, 4)

@@ -31,6 +31,14 @@ func _ready() -> void:
 	title.focus_mode = Control.FOCUS_NONE
 	title.pressed.connect(func() -> void: Game.goto("res://scenes/title.gd"))
 	ui.add_child(title)
+	var mute := Button.new()
+	mute.text = "Sound: off" if Game.muted else "Sound: on"
+	mute.position = Vector2(225, 668)
+	mute.focus_mode = Control.FOCUS_NONE
+	mute.pressed.connect(func() -> void:
+		Game.toggle_mute()
+		mute.text = "Sound: off" if Game.muted else "Sound: on")
+	ui.add_child(mute)
 	_reset_btn = Button.new()
 	_reset_btn.text = "Reset Progress"
 	_reset_btn.position = Vector2(1120, 668)
@@ -64,20 +72,25 @@ func final_open() -> bool:
 
 func _process(delta: float) -> void:
 	t += delta
-	var m := get_global_mouse_position()
-	hover = -1
+	hover = _card_at(get_global_mouse_position()) if not DisplayServer.is_touchscreen_available() else -1
+	queue_redraw()
+
+
+func _card_at(m: Vector2) -> int:
 	for i in Game.LEVELS.size():
 		if card_rect(i).has_point(m):
-			hover = i
+			return i
 	if final_rect().has_point(m):
-		hover = 10
-	queue_redraw()
+		return 10
+	return -1
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if hover >= 0:
-			_open(hover)
+		var hit := _card_at(event.position)
+		if hit >= 0:
+			sel = hit
+			_open(hit)
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.physical_keycode:
 			KEY_LEFT, KEY_A:
@@ -130,7 +143,7 @@ func _draw() -> void:
 	for i in Game.LEVELS.size():
 		_draw_card(i)
 	_draw_final()
-	Art.text(self, Vector2(640, 705), "Arrows + Space, or click a case", 18, Color(1, 1, 1, 0.6), true, 4)
+	Art.text(self, Vector2(640, 705), "Click or tap a case", 18, Color(1, 1, 1, 0.6), true, 4)
 
 
 func _draw_card(i: int) -> void:

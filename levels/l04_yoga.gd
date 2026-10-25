@@ -50,7 +50,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number four. Hot yoga with Yogi Breeze. Ninety-five degrees. No windows."],
 		["Yogi Breeze", "Breathe in... and breathe out. Let everything... release."],
 		["Squelch", "If you insist."],
-		["Narrator", "When a note reaches the line, press the matching ARROW key, or tap the lane. Hit seventy percent to keep the class guessing!"],
+		["Narrator", "When a note reaches the line, tap or click its circle, or press the matching ARROW key. Hit seventy percent to keep the class guessing!"],
 	]
 
 
@@ -61,7 +61,7 @@ func win_lines() -> Array:
 	]
 
 
-func uses_touch() -> bool:
+func uses_action_button() -> bool:
 	return false
 
 
@@ -105,10 +105,15 @@ func _unhandled_input(event: InputEvent) -> void:
 				puff(Vector2(260 + i * 90, 560), 4)
 			found_egg()
 			return
-		if state == "play":
-			for i in 4:
-				if absf(p.x - LANES[i].x) < 50.0 and p.y > 380.0:
-					_press(i)
+
+	# lanes: a real mouse click or any finger (so two-note chords work on touch screens)
+	var lane_press: bool = (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed
+		and event.button_index == MOUSE_BUTTON_LEFT and event.device != InputEvent.DEVICE_ID_EMULATION)
+	if lane_press and state == "play":
+		var lp: Vector2 = event.position
+		for i in 4:
+			if absf(lp.x - LANES[i].x) < 55.0 and lp.y > 380.0:
+				_press(i)
 
 
 func _press(lane: int) -> void:

@@ -35,7 +35,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number eight. The Metropolitan Symphony. Tonight: a world-premiere tuba concerto."],
 		["Squelch", "The tuba player has, shall we say, mysteriously eaten some bad clams. Luckily I brought my own instrument."],
 		["Maestro", "Tuba! Repeat after me. And please... play with feeling."],
-		["Narrator", "Watch the Maestro's phrase, then repeat it with the ARROW keys or by clicking the valves. Four phrases to finish the concerto. Three wrong notes and you're out."],
+		["Narrator", "Watch the Maestro's phrase, then repeat it by clicking or tapping the valves, or with the ARROW keys. Four phrases to finish the concerto. Three wrong notes and you're out."],
 	]
 
 
@@ -46,7 +46,7 @@ func win_lines() -> Array:
 	]
 
 
-func uses_touch() -> bool:
+func uses_action_button() -> bool:
 	return false
 
 

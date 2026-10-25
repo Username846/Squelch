@@ -34,7 +34,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number five. Le Bistro Pew. Three Michelin stars. A four-month waiting list."],
 		["Chef Pierre", "Ze soup tonight is a delicate lobster bisque. It must be served... parfait."],
 		["Squelch", "Parfait? Oh, I'll add a little something extra."],
-		["Narrator", "When a dish is uncovered, click it (or press its number 1 to 5) to season it. If the waiter is looking at that table, you're busted! Season ten dishes."],
+		["Narrator", "When a dish is uncovered, click or tap it (or press its number 1 to 5) to season it. If the waiter is looking at that table, you're busted! Season ten dishes."],
 	]
 
 
@@ -46,11 +46,7 @@ func win_lines() -> Array:
 	]
 
 
-func uses_dpad() -> bool:
-	return false
-
-
-func uses_touch() -> bool:
+func uses_action_button() -> bool:
 	return false
 
 
@@ -220,4 +216,4 @@ func draw_hud() -> void:
 		return
 	Art.text(self, Vector2(830, 140), "Dishes seasoned: %d / %d" % [seasoned, GOAL], 30, Color.WHITE, true, 6)
 	Art.text(self, Vector2(830, 180), "Strikes: %d / 3" % strikes, 26, Color(1, 0.5, 0.5), true, 6)
-	Art.text(self, Vector2(640, 330), "Click open dishes while the waiter's gaze (yellow) isn't on them", 20, Color(1, 1, 1, 0.75), true, 5)
+	Art.text(self, Vector2(640, 330), "Click / tap open dishes while the waiter's gaze (yellow) isn't on them", 20, Color(1, 1, 1, 0.75), true, 5)

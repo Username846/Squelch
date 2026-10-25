@@ -26,6 +26,14 @@ func music_name() -> String:
 	return "getaway"
 
 
+func action_pos() -> Vector2:
+	return Vector2(1170, 160)
+
+
+func action_text() -> String:
+	return "BOOST"
+
+
 func setup() -> void:
 	level_id = "getaway"
 
@@ -35,7 +43,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number seven. The cops finally have Squelch's license plate. P-U-1."],
 		["Officer", "Pull over! You're under arrest for... uh... the smell!"],
 		["Squelch", "Arrest me? You'll have to catch me first. Bean-powered engine, engage!"],
-		["Narrator", "UP and DOWN to change lanes. SPACE for a fart boost: you smash through anything while boosting. Grab bean cans for more gas. Escape after 1600 meters!"],
+		["Narrator", "Tap or click a lane to switch to it, or use UP and DOWN. BOOST (or SPACE) fires a fart boost: you smash through anything while boosting. Grab bean cans for more gas. Escape after 1600 meters!"],
 	]
 
 
@@ -118,6 +126,16 @@ func play_process(delta: float) -> void:
 		win()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	super(event)
+	if state == "play" and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var y: float = event.position.y
+		if y > 640.0:
+			lane = 3
+		elif y > 250.0:
+			lane = clampi(roundi((y - LANE_Y[0]) / 120.0), 0, 2)
+
+
 func draw_level() -> void:
 	draw_rect(Rect2(0, 0, 1280, 720), Color(0.3, 0.55, 0.25))
 	# skyline strip
@@ -188,5 +206,5 @@ func draw_hud() -> void:
 	if state != "play":
 		return
 	Art.meter(self, Rect2(20, 16, 380, 32), dist / GOAL, Color(0.4, 0.7, 1.0), "ESCAPE  %d / %d m" % [int(dist), int(GOAL)])
-	Art.meter(self, Rect2(420, 16, 260, 32), gas / 100.0, Art.GAS, "GAS (SPACE)")
+	Art.meter(self, Rect2(420, 16, 260, 32), gas / 100.0, Art.GAS, "GAS")
 	Art.meter(self, Rect2(700, 16, 300, 32), police / 100.0, Color(1, 0.3, 0.3), "COPS")

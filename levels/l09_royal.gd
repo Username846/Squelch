@@ -45,7 +45,7 @@ func intro_lines() -> Array:
 	return [
 		["Narrator", "Crime number nine. Buckingham Garden. Tea with Her Majesty the Queen."],
 		["Squelch", "I've eaten nothing but baked beans and boiled eggs for three days. For queen and country."],
-		["Narrator", "Your gut pressure keeps rising. MASH SPACE (or the CLENCH button) to hold it in. When the cannon fires, press X (or RELEASE) to let it out under the BOOM."],
+		["Narrator", "Your gut pressure keeps rising. Mash the CLENCH button (or SPACE) to hold it in. When the cannon fires, hit RELEASE (or X) to let it out under the BOOM."],
 		["Narrator", "Release at the wrong moment or burst, and it's a royal scandal. Hide four blasts under cannon fire!"],
 	]
 
@@ -57,7 +57,7 @@ func win_lines() -> Array:
 	]
 
 
-func uses_touch() -> bool:
+func uses_action_button() -> bool:
 	return false
 
 

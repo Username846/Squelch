@@ -32,6 +32,18 @@ func music_name() -> String:
 	return "heist"
 
 
+func uses_pointer_move() -> bool:
+	return true
+
+
+func action_pos() -> Vector2:
+	return Vector2(960, 620)
+
+
+func action_text() -> String:
+	return "GAS"
+
+
 func setup() -> void:
 	level_id = "heist"
 	pp = START
@@ -51,7 +63,7 @@ func intro_lines() -> Array:
 		["Narrator", "Crime number ten. Police Headquarters. The Evidence Room."],
 		["Squelch", "They took my Golden Bean. A family heirloom. Four generations of Squelches have eaten from it."],
 		["Squelch", "Tonight, I take it back."],
-		["Narrator", "Sneak to the evidence room in the top right, grab the Golden Bean, and return to the exit. SPACE drops a gas cloud. Guards who walk into it pass out. Don't get seen!"],
+		["Narrator", "Sneak to the evidence room in the top right, grab the Golden Bean, and return to the exit. Hold the mouse or your finger to walk. The GAS button (or SPACE) drops a gas cloud. Guards who walk into it pass out. Don't get seen!"],
 	]
 
 

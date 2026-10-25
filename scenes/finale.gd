@@ -14,6 +14,7 @@ var clouds: Array = []
 
 func _ready() -> void:
 	Game.play_music("finale")
+	Game.set_skip(func() -> void: Game.goto("res://scenes/credits.gd"))
 	_run.call_deferred()
 
 

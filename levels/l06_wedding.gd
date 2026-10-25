@@ -34,7 +34,7 @@ func intro_lines() -> Array:
 	return [
 		["Narrator", "Crime number six. St. Agnes Cathedral. A beautiful June wedding."],
 		["Squelch", "Ah, weddings. The rings. The vows. The acoustics."],
-		["Narrator", "At each sacred moment, a gauge appears. Press SPACE, or click, when the marker is in the green zone. Miss three times and the ushers throw you out."],
+		["Narrator", "At each sacred moment, a gauge appears. Click, tap, or press SPACE when the marker is in the green zone. Miss three times and the ushers throw you out."],
 	]
 
 
@@ -45,8 +45,12 @@ func win_lines() -> Array:
 	]
 
 
-func uses_dpad() -> bool:
-	return false
+func action_text() -> String:
+	return "BLAST"
+
+
+func action_active() -> bool:
+	return phase == "swing"
 
 
 func start_play() -> void:
@@ -65,7 +69,6 @@ func _cue() -> void:
 	marker = 0.0
 	mdir = 1.0
 	zone_c = randf_range(0.25, 0.75)
-	Game.set_touch_controls(true, false, "BLAST")
 
 
 func play_process(delta: float) -> void:
@@ -104,7 +107,6 @@ func _release() -> void:
 	var m: Dictionary = MOMENTS[moment]
 	var half: float = m["zone"] * 0.5
 	phase = "react"
-	Game.set_touch_controls(false)
 	if absf(marker - zone_c) <= half:
 		Game.fart("fart_huge", 0.9 + moment * 0.1, 3.0)
 		blast_t = 2.5
@@ -192,4 +194,4 @@ func draw_hud() -> void:
 		draw_rect(Rect2(r.position.x + (zone_c - half) * r.size.x, r.position.y, half * 2 * r.size.x, r.size.y), Color(0.45, 0.85, 0.3))
 		var mx := r.position.x + marker * r.size.x
 		draw_rect(Rect2(mx - 5, r.position.y - 12, 10, r.size.y + 24), Color.WHITE)
-		Art.text(self, Vector2(640, 320), "SPACE / click in the green!", 28, Color.WHITE, true, 6)
+		Art.text(self, Vector2(640, 320), "Click / tap / SPACE in the green!", 28, Color.WHITE, true, 6)
