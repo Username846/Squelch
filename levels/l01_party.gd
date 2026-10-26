@@ -250,8 +250,8 @@ func draw_hud() -> void:
 	for c: Dictionary in chairs:
 		if c["foul"]:
 			n_foul += 1
-	Art.rrect(self, Rect2(20, 650, 360, 52), Color(0, 0, 0, 0.5), 10)
-	Art.text(self, Vector2(200, 686), "Round %d/3   Chairs fouled: %d/%d" % [round_i + 1, n_foul, chairs.size()], 22, Color.WHITE)
+	Art.rrect(self, Rect2(460, 655, 360, 52), Color(0, 0, 0, 0.5), 10)
+	Art.text(self, Vector2(640, 691), "Round %d/3   Chairs fouled: %d/%d" % [round_i + 1, n_foul, chairs.size()], 22, Color.WHITE)
 	if phase == "music":
 		Art.text(self, Vector2(640, 195), "MUSIC PLAYING...  %.1f" % maxf(phase_t, 0.0), 30, Color(1, 1, 1), true, 6)
 	elif phase == "rush":

@@ -67,6 +67,48 @@ func touch(p: Vector2, down: bool, index := 0) -> void:
 	await frames(2)
 
 
+func drag(p: Vector2, index := 0) -> void:
+	p = to_window(p)
+	var ev := InputEventScreenDrag.new()
+	ev.index = index
+	ev.position = p
+	Input.parse_input_event(ev)
+	await frames(2)
+
+
+func expect(cond: bool, what: String, level: LevelBase) -> void:
+	if not cond:
+		push_error("SMOKE FAIL: %s in %s" % [what, level.level_id])
+
+
+## A finger that lands elsewhere and slides onto a control must press it.
+func _slide_checks(level: LevelBase) -> void:
+	Game.touch_ui = true
+	if level.uses_action_button() and level.action_active():
+		await touch(Vector2(640, 300), true, 3)
+		await drag(level.action_pos() + Vector2(-200, 0), 3)
+		expect(not Input.is_action_pressed("fart"), "fart pressed before reaching the button", level)
+		await drag(level.action_pos(), 3)
+		expect(Input.is_action_pressed("fart"), "sliding onto the action button did not press it", level)
+		await drag(Vector2(640, 300), 3)
+		expect(not Input.is_action_pressed("fart"), "sliding off the action button did not release it", level)
+		await touch(Vector2(640, 300), false, 3)
+	if level.uses_dpad():
+		var c := level.dpad_pos()
+		await touch(Vector2(640, 300), true, 4)
+		await drag(c + Vector2(90, 0), 4)
+		expect(Input.is_action_pressed("right"), "sliding onto d-pad right did not press it", level)
+		await drag(c + Vector2(0, -90), 4)
+		expect(Input.is_action_pressed("up") and not Input.is_action_pressed("right"), "sliding right -> up on the d-pad", level)
+		# second finger on the action button while the first holds the d-pad
+		if level.uses_action_button() and level.action_active():
+			await touch(level.action_pos(), true, 5)
+			expect(Input.is_action_pressed("fart") and Input.is_action_pressed("up"), "d-pad + action at once", level)
+			await touch(level.action_pos(), false, 5)
+		await touch(c + Vector2(0, -90), false, 4)
+		expect(not Input.is_action_pressed("up"), "lifting the finger did not release the d-pad", level)
+
+
 ## Mouse-only and touch-only play: the action button and hold-to-walk must work.
 func _pointer_checks(level: LevelBase) -> void:
 	if level.uses_action_button() and level.action_active():
@@ -124,6 +166,8 @@ func _run() -> void:
 			print("  state after intro: ", level.state)
 			if mode == "play":
 				await _pointer_checks(level)
+				await _slide_checks(level)
+				Game.touch_ui = false
 				for k in 200:
 					var codes := [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_X, KEY_1, KEY_3]
 					var c: Key = codes[k % codes.size()]

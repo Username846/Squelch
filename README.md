@@ -27,12 +27,13 @@ Every crime plays fully with **just a mouse**, **just a touch screen**, or **jus
 
 | | Mouse / touch | Keyboard |
 |---|---|---|
-| Walk (Party, Library, Heist) | hold the mouse button or a finger where you want to go | arrows / WASD |
+| Walk (Party, Library, Heist) | virtual d-pad (touch screens), or hold the mouse / a finger where you want to go | arrows / WASD |
 | Fart / boost / gas | on-screen action button (hold it in the elevator) | Space |
 | Everything else | click or tap the thing (lanes, dishes, valves, buttons) | arrows, Space, X, 1-5 |
 | Skip a cutscene, back to the board, sound | on-screen Skip, X and Sound buttons | Esc, M |
 
-On phones, play in landscape. On touch screens you can walk with one finger and fart with another.
+On phones, play in landscape. On-screen controls react to any finger that is over them, so you can slide onto
+the d-pad or action button instead of tapping, and use both at once. The title screen has a **Fullscreen** button.
 
 ## Tech
 

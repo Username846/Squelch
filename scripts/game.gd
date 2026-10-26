@@ -70,6 +70,8 @@ var current_scene: Node
 var music: AudioStreamPlayer
 var music_name := ""
 var muted := false
+## Show touch controls (virtual d-pad). On for touch screens, or once any touch arrives.
+var touch_ui := false
 
 var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_idx := 0
@@ -101,6 +103,7 @@ var _banner_t := 0.0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	randomize()
+	touch_ui = DisplayServer.is_touchscreen_available()
 	_setup_input()
 	load_save()
 	music = AudioStreamPlayer.new()
@@ -134,6 +137,8 @@ func _setup_input() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		touch_ui = true
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_M:
 		toggle_mute()
 	if not dialog_active:

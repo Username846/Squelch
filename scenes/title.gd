@@ -5,6 +5,7 @@ var t := 0.0
 var puffs: Array = []
 var leaving := false
 var buildings: Array = []
+var fs_btn: Button
 
 
 func _ready() -> void:
@@ -19,6 +20,14 @@ func _ready() -> void:
 		Game.toggle_mute()
 		mute.text = "Sound: off" if Game.muted else "Sound: on")
 	ui.add_child(mute)
+	if _fullscreen_supported():
+		fs_btn = Button.new()
+		fs_btn.position = Vector2(20, 20)
+		fs_btn.custom_minimum_size = Vector2(170, 52)
+		fs_btn.focus_mode = Control.FOCUS_NONE
+		fs_btn.add_theme_font_size_override("font_size", 22)
+		fs_btn.pressed.connect(_toggle_fullscreen)
+		ui.add_child(fs_btn)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 42
 	var x := 0.0
@@ -28,8 +37,34 @@ func _ready() -> void:
 		x += w + rng.randf_range(0, 10)
 
 
+func _is_fullscreen() -> bool:
+	var m := DisplayServer.window_get_mode()
+	return m == DisplayServer.WINDOW_MODE_FULLSCREEN or m == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+
+
+## iPhones' Safari has no fullscreen API for games, so the button is hidden there.
+func _fullscreen_supported() -> bool:
+	if not OS.has_feature("web"):
+		return true
+	return bool(JavaScriptBridge.eval("!!(document.fullscreenEnabled || document.webkitFullscreenEnabled)", true))
+
+
+func _toggle_fullscreen() -> void:
+	Game.sfx("click")
+	if _is_fullscreen():
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		return
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	if OS.has_feature("web"):
+		# phones: also try to lock to landscape once fullscreen kicks in
+		await get_tree().create_timer(0.5).timeout
+		JavaScriptBridge.eval("try{screen.orientation.lock('landscape').catch(function(){})}catch(e){}", true)
+
+
 func _process(delta: float) -> void:
 	t += delta
+	if fs_btn:
+		fs_btn.text = "Exit Fullscreen" if _is_fullscreen() else "Fullscreen"
 	if randf() < delta * 5.0:
 		puffs.append({"p": Vector2(640 + randf_range(-30, 30), 560), "v": Vector2(randf_range(-60, 60), randf_range(-60, -20)), "r": randf_range(14, 26), "life": 2.5})
 	for p: Dictionary in puffs:

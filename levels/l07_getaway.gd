@@ -34,6 +34,10 @@ func action_text() -> String:
 	return "BOOST"
 
 
+func uses_dpad() -> bool:
+	return true
+
+
 func setup() -> void:
 	level_id = "getaway"
 
